@@ -18,9 +18,9 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@adapterIn/*": ["/adapters/in/*"],
-      "@adapterOut/*": ["/adapters/out/*"],
-      "@application/*": ["/application/*"]
+      "@adapterIn/*": ["adapters/in/*"],
+      "@adapterOut/*": ["adapters/out/*"],
+      "@application/*": ["application/*"]
     }
   }
 }
