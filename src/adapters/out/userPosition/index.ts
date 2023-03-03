@@ -1,2 +1,2 @@
-export * from './positions.model';
-export * from './userPosition.model';
+export * from './positions';
+export * from './userPosition.schema';
