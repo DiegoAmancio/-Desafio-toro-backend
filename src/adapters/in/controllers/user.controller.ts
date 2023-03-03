@@ -1,5 +1,5 @@
 import { IAccountService } from '@application/in';
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, Query } from '@nestjs/common';
 import { UserPositionEntity } from 'domain/entities';
 import { Providers } from 'domain/enums';
 
@@ -10,9 +10,7 @@ export class UserController {
     private userAccountService: IAccountService,
   ) {}
   @Get()
-  findAll(): Promise<UserPositionEntity> {
-    return this.userAccountService.getAccountPositions(
-      '640154b91def1e19b60f4ca6',
-    );
+  getAccountPositions(@Query() query: any): Promise<UserPositionEntity> {
+    return this.userAccountService.getAccountPositions(query.id);
   }
 }
