@@ -1,5 +1,5 @@
+import { UserEntity } from '@adapterOut/user';
 import { CreateUserDTO, GetUserDTO } from 'domain/dto';
-import { UserEntity } from 'domain/entities';
 
 export interface IUserRepository {
   getUser(payload: GetUserDTO): Promise<UserEntity>;

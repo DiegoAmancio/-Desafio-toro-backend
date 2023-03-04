@@ -26,16 +26,13 @@ export class AuthService implements IAuthService {
 
     const { id, email, name } = await this.googleService.getUserByToken(token);
 
-    const user = await this.userService.getUser({ PK: 'USER', SK: id });
-
-    if (!user) {
-      await this.userService.createUser({
-        document: 'fsaifsa',
+    await this.userService.getUser({ PK: 'USER', SK: id }).catch(() =>
+      this.userService.createUser({
         email,
         id,
         name,
-      });
-    }
+      }),
+    );
 
     return {
       name,

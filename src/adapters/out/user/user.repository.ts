@@ -2,7 +2,7 @@ import { DynamoDB } from 'aws-sdk';
 import { DataMapper } from '@aws/dynamodb-data-mapper';
 import { IUserRepository } from '@application/out';
 import { Injectable } from '@nestjs/common';
-import { UserEntity } from 'domain/entities/user.entity';
+import { UserEntity } from './user.entity';
 import { CreateUserDTO, GetUserDTO } from 'domain/dto';
 
 @Injectable()
@@ -16,16 +16,14 @@ export class UserRepository implements IUserRepository {
   }
 
   async getUser(payload: GetUserDTO): Promise<UserEntity> {
-    try {
-      const item = new UserEntity();
-      if (payload.PK && payload.SK) {
-        item.PK = payload.PK;
-        item.SK = payload.SK;
-        return this.mapper.get<UserEntity>(item);
-      }
+    const item = new UserEntity();
+    if (payload.PK && payload.SK) {
+      item.PK = payload.PK;
+      item.SK = payload.SK;
+      return this.mapper.get<UserEntity>(item);
+    }
 
-      throw 'need PK and SK';
-    } catch (error) {}
+    throw 'need PK and SK';
   }
 
   async createUser(payload: CreateUserDTO): Promise<void> {
