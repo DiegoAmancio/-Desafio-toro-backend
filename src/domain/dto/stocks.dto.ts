@@ -1,4 +1,4 @@
-export class StocksEntity {
+export class StocksDTO {
   currentPrice: number;
   symbol: string;
   constructor(symbol: string, currentPrice: number) {

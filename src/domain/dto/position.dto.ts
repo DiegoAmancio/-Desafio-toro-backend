@@ -1,10 +1,11 @@
-import { Position } from '@adapterOut/userPosition';
-
-export class PositionEntity extends Position {
+export class PositionDTO {
+  symbol: string;
+  amount: number;
   currentPrice: number;
 
   constructor(symbol: string, amount: number, currentPrice: number) {
-    super(symbol, amount);
+    this.symbol = symbol;
+    this.amount = amount;
     this.currentPrice = currentPrice;
   }
 }

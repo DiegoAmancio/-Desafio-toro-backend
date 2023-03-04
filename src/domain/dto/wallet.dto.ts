@@ -1,8 +1,8 @@
-import { PositionEntity } from './positions.entity';
+import { PositionDTO } from './position.dto';
 
-export class UserPositionEntity {
+export class WalletDTO {
   checkingAccountAmount: number;
-  positions: PositionEntity[];
+  positions: PositionDTO[];
   consolidated: number;
 
   constructor(checkingAccountAmount = 0, positions = []) {

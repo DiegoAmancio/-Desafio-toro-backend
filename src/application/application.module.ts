@@ -3,13 +3,13 @@ import { Provider, Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { Providers } from 'domain/enums';
 import { JwtStrategy } from './jwt/jwt.strategy';
-import { AccountService, GoogleService, UserService } from './service';
+import { WalletService, GoogleService, UserService } from './service';
 import { AuthService } from './service/auth.service';
 import { JwtModule as module } from '@nestjs/jwt';
 
 const accountServiceProvider: Provider = {
   provide: Providers.I_ACCOUNT_SERVICE,
-  useClass: AccountService,
+  useClass: WalletService,
 };
 
 const googleServiceProvider: Provider = {

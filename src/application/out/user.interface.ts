@@ -1,7 +1,7 @@
 import { UserEntity } from '@adapterOut/user';
-import { CreateUserDTO, GetUserDTO } from 'domain/dto';
+import { CreateUserDTO, GetItemDTO } from 'domain/dto';
 
 export interface IUserRepository {
-  getUser(payload: GetUserDTO): Promise<UserEntity>;
+  getUser(payload: GetItemDTO): Promise<UserEntity>;
   createUser(payload: CreateUserDTO): Promise<void>;
 }

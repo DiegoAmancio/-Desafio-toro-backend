@@ -3,7 +3,7 @@ import { DataMapper } from '@aws/dynamodb-data-mapper';
 import { IUserRepository } from '@application/out';
 import { Injectable } from '@nestjs/common';
 import { UserEntity } from './user.entity';
-import { CreateUserDTO, GetUserDTO } from 'domain/dto';
+import { CreateUserDTO, GetItemDTO } from 'domain/dto';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
@@ -15,7 +15,7 @@ export class UserRepository implements IUserRepository {
     this.mapper = new DataMapper({ client: this.client });
   }
 
-  async getUser(payload: GetUserDTO): Promise<UserEntity> {
+  async getUser(payload: GetItemDTO): Promise<UserEntity> {
     const item = new UserEntity();
     if (payload.PK && payload.SK) {
       item.PK = payload.PK;

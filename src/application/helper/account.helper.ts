@@ -1,9 +1,10 @@
-import { Position } from '@adapterOut/userPosition';
+import { WalletEntity } from '@adapterOut/wallet/wallet.entity';
 import { getBDR } from '@application/api/iex.api';
 import { HttpException } from '@nestjs/common';
-import { PositionEntity, UserPositionEntity } from 'domain/entities';
+import { Position } from '@adapterOut/wallet/position';
+import { PositionDTO, WalletDTO } from 'domain/dto';
 
-export const accumulateConsolidated = (positions: PositionEntity[]) =>
+export const accumulateConsolidated = (positions: PositionDTO[]) =>
   positions.reduce((count, { currentPrice }) => count + currentPrice, 0);
 
 export const getPositionsCurrentValues = async (
@@ -31,7 +32,7 @@ export const positionsModelToEntityList = (
   positionsModel.map(({ symbol, amount }) => {
     const currentPrice = positionsCurrentValues[symbol];
 
-    return new PositionEntity(symbol, amount, currentPrice);
+    return new PositionDTO(symbol, amount, currentPrice);
   });
 
 export const validateOrder = (
@@ -44,10 +45,7 @@ export const validateOrder = (
     throw new HttpException('Não há saldo disponível', 400);
   }
 };
-const addPosition = (
-  newPosition: PositionEntity,
-  accountPosition: UserPositionEntity,
-) => {
+const addPosition = (newPosition: PositionDTO, accountPosition: WalletDTO) => {
   const exist = accountPosition.positions.some(
     position => position.symbol === newPosition.symbol,
   );
@@ -61,18 +59,15 @@ const addPosition = (
       })
     : accountPosition.positions.concat([newPosition]);
 
-  return new UserPositionEntity(
-    accountPosition.checkingAccountAmount,
-    updatedPositions,
-  );
+  return new WalletDTO(accountPosition.checkingAccountAmount, updatedPositions);
 };
 export const addOrder = (
-  newPosition: PositionEntity,
-  accountPosition: UserPositionEntity,
+  newPosition: PositionDTO,
+  accountPosition: WalletDTO,
 ) => {
   const price = newPosition.currentPrice * newPosition.amount;
 
-  const newAccountPosition = new UserPositionEntity(
+  const newAccountPosition = new WalletDTO(
     accountPosition.checkingAccountAmount - price,
     accountPosition.positions,
   );

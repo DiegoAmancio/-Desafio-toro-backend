@@ -4,7 +4,7 @@ import { IAuthService } from '@application/in/auth.interface';
 import { IGoogleService } from '@application/in/google.interface';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Providers } from 'domain/enums';
+import { PK, Providers } from 'domain/enums';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -26,7 +26,7 @@ export class AuthService implements IAuthService {
 
     const { id, email, name } = await this.googleService.getUserByToken(token);
 
-    await this.userService.getUser({ PK: 'USER', SK: id }).catch(() =>
+    await this.userService.getUser({ PK: PK.USER, SK: id }).catch(() =>
       this.userService.createUser({
         email,
         id,
