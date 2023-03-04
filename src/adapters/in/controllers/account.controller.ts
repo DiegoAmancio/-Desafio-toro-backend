@@ -5,15 +5,15 @@ import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
 import { UserPositionEntity } from 'domain/entities';
 import { Providers } from 'domain/enums';
 
-@Controller('')
+@Controller('userPosition')
 export class AccountController {
   constructor(
     @Inject(Providers.I_ACCOUNT_SERVICE)
     private userAccountService: IAccountService,
   ) {}
-  @Get()
+  @Get('')
   @UseGuards(JwtAuthGuard)
   getAccountPositions(@Req() req: any): Promise<UserPositionEntity> {
-    return this.userAccountService.getAccountPositions(req.user.googleId);
+    return this.userAccountService.getAccountPositions(req.user.id);
   }
 }

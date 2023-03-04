@@ -15,7 +15,31 @@ export class AccountService implements IAccountService {
     @Inject(Providers.I_ACCOUNT_REPOSITORY)
     private readonly accountRepository: IAccountRepository,
   ) {}
+  async createAccountPositions(id: string): Promise<void> {
+    this.logger.log(`getAccountPositions ${id}`);
+    await this.accountRepository.createAccountPositions(id);
+  }
   async getAccountPositions(id: string): Promise<UserPositionEntity> {
+    this.logger.log(`getAccountPositions ${id}`);
+
+    const accountPosition = await this.accountRepository.getAccountPositions(
+      id,
+    );
+
+    const positionsCurrentValues = await getPositionsCurrentValues(
+      accountPosition.positions.map(({ symbol }) => symbol),
+    );
+
+    return new UserPositionEntity(
+      accountPosition.checkingAccountAmount,
+      positionsModelToEntityList(
+        accountPosition.positions,
+        positionsCurrentValues,
+      ),
+    );
+  }
+
+  async createAccountPosition(id: string) {
     this.logger.log(`getAccountPositions ${id}`);
 
     const accountPosition = await this.accountRepository.getAccountPositions(

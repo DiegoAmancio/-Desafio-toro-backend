@@ -1,5 +1,5 @@
 import { UserDocument } from '@adapterOut/user';
-import { IUserService } from '@application/in';
+import { IAccountService, IUserService } from '@application/in';
 
 import { IUserRepository } from '@application/out';
 import { Injectable, Logger, Inject } from '@nestjs/common';
@@ -12,11 +12,21 @@ export class UserService implements IUserService {
   constructor(
     @Inject(Providers.I_USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
+    @Inject(Providers.I_ACCOUNT_SERVICE)
+    private readonly accountService: IAccountService,
   ) {}
-  createUser(id: string, name: string, email: string): Promise<UserDocument> {
+  async createUser(
+    id: string,
+    name: string,
+    email: string,
+  ): Promise<UserDocument> {
     this.logger.log(`createUser ${id}`);
 
-    return this.userRepository.createUser(id, name, email);
+    const user = await this.userRepository.createUser(id, name, email);
+
+    await this.accountService.createAccountPositions(user.id);
+
+    return user;
   }
   getUser(id: string): Promise<UserDocument> {
     this.logger.log(`getUser ${id}`);

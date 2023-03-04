@@ -1,11 +1,16 @@
-import { Module, Provider } from '@nestjs/common';
-import { Providers } from 'domain/enums';
-import { AccountService, GoogleService, UserService } from './service';
 import { AdapterOutModule } from '@adapterOut/adapter.out.module';
-import { JwtModule as module } from '@nestjs/jwt';
+import { Provider, Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
+import { Providers } from 'domain/enums';
 import { JwtStrategy } from './jwt/jwt.strategy';
+import {
+  AccountService,
+  GoogleService,
+  UserService,
+  StocksService,
+} from './service';
 import { AuthService } from './service/auth.service';
+import { JwtModule as module } from '@nestjs/jwt';
 
 const accountServiceProvider: Provider = {
   provide: Providers.I_ACCOUNT_SERVICE,
@@ -26,6 +31,10 @@ const userServiceProvider: Provider = {
   provide: Providers.I_USER_SERVICE,
   useClass: UserService,
 };
+const stocksServiceProvider: Provider = {
+  provide: Providers.I_STOCKS_SERVICE,
+  useClass: StocksService,
+};
 
 @Module({
   imports: [
@@ -42,12 +51,14 @@ const userServiceProvider: Provider = {
     JwtStrategy,
     authServiceProvider,
     userServiceProvider,
+    stocksServiceProvider,
   ],
   exports: [
     accountServiceProvider,
     googleServiceProvider,
     JwtStrategy,
     authServiceProvider,
+    stocksServiceProvider,
     userServiceProvider,
   ],
 })

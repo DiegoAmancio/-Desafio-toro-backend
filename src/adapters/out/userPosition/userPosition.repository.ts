@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { Document, Model, Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { UserPositionDocument, UserPositionModel } from './userPosition.schema';
@@ -10,7 +10,11 @@ export class AccountRepository implements IAccountRepository {
     @InjectModel(UserPositionModel.name)
     private userPosition: Model<UserPositionDocument>,
   ) {}
-  async getAccountPositions(googleId: string): Promise<UserPositionDocument> {
-    return this.userPosition.findOne({ googleId });
+  createAccountPositions(id: string): Promise<UserPositionDocument> {
+    const account = new this.userPosition(new UserPositionModel(id));
+    return account.save();
+  }
+  async getAccountPositions(userId: string): Promise<UserPositionDocument> {
+    return this.userPosition.findOne({ user: userId });
   }
 }

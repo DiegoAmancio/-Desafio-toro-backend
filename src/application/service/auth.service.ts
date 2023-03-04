@@ -36,7 +36,7 @@ export class AuthService implements IAuthService {
     return {
       name,
       access_token: this.jwtService.sign({
-        googleId: id,
+        id: user.id,
         email,
         name,
       }),
