@@ -1,9 +1,8 @@
-import { UserDocument } from '@adapterOut/user';
-import { IAccountService, IUserService } from '@application/in';
-
+import { IUserService, IAccountService } from '@application/in';
 import { IUserRepository } from '@application/out';
 import { Injectable, Logger, Inject } from '@nestjs/common';
-
+import { CreateUserDTO, GetUserDTO } from 'domain/dto';
+import { UserEntity } from 'domain/entities';
 import { Providers } from 'domain/enums';
 
 @Injectable()
@@ -15,22 +14,16 @@ export class UserService implements IUserService {
     @Inject(Providers.I_ACCOUNT_SERVICE)
     private readonly accountService: IAccountService,
   ) {}
-  async createUser(
-    id: string,
-    name: string,
-    email: string,
-  ): Promise<UserDocument> {
-    this.logger.log(`createUser ${id}`);
+  async createUser(payload: CreateUserDTO): Promise<void> {
+    this.logger.log(`createUser ${payload.document}`);
 
-    const user = await this.userRepository.createUser(id, name, email);
+    await this.userRepository.createUser(payload);
 
-    await this.accountService.createAccountPositions(user.id);
-
-    return user;
+    await this.accountService.createAccountPositions(payload.id);
   }
-  getUser(id: string): Promise<UserDocument> {
-    this.logger.log(`getUser ${id}`);
+  getUser(payload: GetUserDTO): Promise<UserEntity> {
+    this.logger.log('getUser');
 
-    return this.userRepository.getUser(id);
+    return this.userRepository.getUser(payload);
   }
 }

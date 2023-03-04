@@ -1,29 +1,37 @@
+import { DynamoDB } from 'aws-sdk';
+import { DataMapper } from '@aws/dynamodb-data-mapper';
 import { IUserRepository } from '@application/out';
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { UserModel, UserDocument } from './user.schema';
+import { UserEntity } from 'domain/entities/user.entity';
+import { CreateUserDTO, GetUserDTO } from 'domain/dto';
 
 @Injectable()
 export class UserRepository implements IUserRepository {
-  constructor(
-    @InjectModel(UserModel.name)
-    private user: Model<UserDocument>,
-  ) {}
-  async getUser(id: string): Promise<UserDocument> {
-    return this.user.findOne({ googleId: id });
+  private mapper: DataMapper;
+  private client: DynamoDB;
+
+  constructor() {
+    this.client = new DynamoDB({ region: 'us-east-1' });
+    this.mapper = new DataMapper({ client: this.client });
   }
 
-  async createUser(
-    googleId: string,
-    name: string,
-    email: string,
-  ): Promise<UserDocument> {
-    const user = new this.user({
-      googleId,
-      name,
-      email,
-    });
-    return user.save();
+  async getUser(payload: GetUserDTO): Promise<UserEntity> {
+    try {
+      const item = new UserEntity();
+      if (payload.PK && payload.SK) {
+        item.PK = payload.PK;
+        item.SK = payload.SK;
+        return this.mapper.get<UserEntity>(item);
+      }
+
+      throw 'need PK and SK';
+    } catch (error) {}
+  }
+
+  async createUser(payload: CreateUserDTO): Promise<void> {
+    const item = new UserEntity();
+    item.fill(payload.id, payload.email, payload.name);
+
+    await this.mapper.put<UserEntity>(item);
   }
 }
