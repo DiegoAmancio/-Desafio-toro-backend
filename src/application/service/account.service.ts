@@ -10,7 +10,7 @@ import { Providers } from 'domain/enums';
 
 @Injectable()
 export class AccountService implements IAccountService {
-  private readonly logger = new Logger('AccountService');
+  private readonly logger = new Logger(AccountService.name);
   constructor(
     @Inject(Providers.I_ACCOUNT_REPOSITORY)
     private readonly accountRepository: IAccountRepository,

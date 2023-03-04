@@ -10,7 +10,7 @@ export class AccountRepository implements IAccountRepository {
     @InjectModel(UserPositionModel.name)
     private userPosition: Model<UserPositionDocument>,
   ) {}
-  async getAccountPositions(id: string): Promise<UserPositionDocument> {
-    return this.userPosition.findById(id);
+  async getAccountPositions(googleId: string): Promise<UserPositionDocument> {
+    return this.userPosition.findOne({ googleId });
   }
 }
