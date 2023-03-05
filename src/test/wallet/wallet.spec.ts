@@ -13,6 +13,7 @@ import {
   walletPatternId,
 } from './wallet.mock';
 import { IIexApi } from '@application/out/iex.interface';
+import { HttpException } from '@nestjs/common';
 
 describe('WalletService', () => {
   let service: WalletService;
@@ -74,6 +75,18 @@ describe('WalletService', () => {
       expect(mockIexApi.getMultipleBDRs).toBeCalledWith(defaultTopFiveWallets);
 
       expect(wallet).toStrictEqual(successfulGetTopFive);
+    });
+    it('should be not get top five stocks', async () => {
+      mockIexApi.getMultipleBDRs = jest
+        .fn()
+        .mockReturnValue([null, ...mockIex]);
+      try {
+        await service.getTopFiveStocks();
+      } catch (error) {
+        expect(error).toStrictEqual(
+          new HttpException('Ativos não encontrados', 404),
+        );
+      }
     });
   });
   // describe('When order stock', () => {

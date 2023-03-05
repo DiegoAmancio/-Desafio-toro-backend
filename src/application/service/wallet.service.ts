@@ -31,7 +31,7 @@ export class WalletService implements IWalletService {
 
     const bdrs = await this.iexAPI.getMultipleBDRs(topFiveStocks);
 
-    validBDRResponse(bdrs, topFiveStocks);
+    validBDRResponse(bdrs);
 
     return mapBDRsToStocksDTO(bdrs);
   }

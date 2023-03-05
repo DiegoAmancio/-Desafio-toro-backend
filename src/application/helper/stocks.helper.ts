@@ -1,8 +1,8 @@
 import { HttpException } from '@nestjs/common';
 import { StocksDTO } from 'domain/dto/stocks.dto';
 
-export const validBDRResponse = (symbols: string[], itens: any[]) => {
-  if (symbols.length !== Object.keys(itens).length) {
+export const validBDRResponse = (itens: any[]) => {
+  if (itens.some(item => item === null)) {
     throw new HttpException('Ativos não encontrados', 404);
   }
 };
