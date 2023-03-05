@@ -29,9 +29,7 @@ export class WalletService implements IWalletService {
 
     const topFiveStocks = ['JPM', 'GOOGL', 'BRK.B', 'JNJ', 'AAPL'];
 
-    const bdrs = await Promise.all(
-      topFiveStocks.map(bdr => this.iexAPI.getBDR(bdr)),
-    );
+    const bdrs = await this.iexAPI.getMultipleBDRs(topFiveStocks);
 
     validBDRResponse(bdrs, topFiveStocks);
 

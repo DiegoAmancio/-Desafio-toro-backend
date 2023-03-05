@@ -1,7 +1,7 @@
 import { IUserService } from '@application/in';
 import { IAuthService } from '@application/in/auth.interface';
+import { IGoogleApi } from '@application/out';
 
-import { IGoogleService } from '@application/out/google.interface';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PK, Providers } from 'domain/enums';
@@ -14,7 +14,7 @@ export class AuthService implements IAuthService {
     @Inject(Providers.I_USER_SERVICE)
     private userService: IUserService,
     @Inject(Providers.I_GOOGLE_SERVICE)
-    private googleService: IGoogleService,
+    private googleService: IGoogleApi,
     private jwtService: JwtService,
   ) {}
   getUserByToken(token: string) {

@@ -5,16 +5,15 @@ import { WalletService } from '@application/service';
 import { PK, Providers } from 'domain/enums';
 import {
   createWallet,
+  defaultTopFiveWallets,
   getWallet,
   getWalletRepository,
   mockIex,
+  successfulGetTopFive,
   walletPatternId,
 } from './wallet.mock';
 import { IIexApi } from '@application/out/iex.interface';
-// getAuthor: jest.fn().mockReturnValue(null),
-// createAndSaveAuthor: jest.fn().mockReturnValue(authorMock),
-// updateAuthor: jest.fn().mockReturnValue(true),
-// deleteAuthor: jest.fn().mockReturnValue(true),
+
 describe('WalletService', () => {
   let service: WalletService;
 
@@ -68,11 +67,28 @@ describe('WalletService', () => {
       expect(wallet).toStrictEqual(getWallet);
     });
   });
-  // describe('When get Author', () => {
-  //   it('should be get Author by id', async () => {
-  //     const author = await service.getAuthor(authorMock.id);
+  describe('When get top five stocks', () => {
+    it('should be get top five stocks with current price', async () => {
+      const wallet = await service.getTopFiveStocks();
 
-  //     expect(mockRepository.getAuthor).toBeCalledWith(authorMock.id);
+      expect(mockIexApi.getMultipleBDRs).toBeCalledWith(defaultTopFiveWallets);
+
+      expect(wallet).toStrictEqual(successfulGetTopFive);
+    });
+  });
+  // describe('When order stock', () => {
+  //   it('should be order stock', async () => {
+  //     const author = await service.orderStocks(
+  //       { amount: 1, symbol: 'JPM' },
+  //       walletPatternId,
+  //     );
+
+  //     expect(mockRepository.getWallet).toBeCalledWith({
+  //       PK: PK.WALLET,
+  //       SK: walletPatternId,
+  //     });
+  //     expect(mockIexApi.getBDR).toBeCalledWith('JPM');
+
   //     expect(author).toStrictEqual(getAuthorMock);
   //   });
   //   it('Should return a exception when does not to find a Author', async () => {

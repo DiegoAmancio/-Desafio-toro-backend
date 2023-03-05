@@ -1,5 +1,6 @@
 import { Position } from '@adapterOut/wallet/position';
 import { WalletEntity } from '@adapterOut/wallet/wallet.entity';
+import { mapBDRsToStocksDTO } from '@application/helper';
 import { PositionDTO, WalletDTO } from 'domain/dto';
 
 export const walletPatternId = '2134';
@@ -16,11 +17,12 @@ const defaultWalletItens = [
   new Position('AAPL', 10),
 ];
 
+export const defaultTopFiveWallets = ['JPM', 'GOOGL', 'BRK.B', 'JNJ', 'AAPL'];
 export const mockIex = defaultWalletItens.map(({ amount, symbol }, index) => ({
   latestPrice: amount * index + 1,
   symbol,
 }));
-console.log(mockIex);
+export const successfulGetTopFive = mapBDRsToStocksDTO(mockIex);
 
 export const getWalletRepository = () => {
   const wallet = new WalletEntity();

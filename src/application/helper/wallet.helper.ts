@@ -2,9 +2,6 @@ import { HttpException } from '@nestjs/common';
 import { Position } from '@adapterOut/wallet/position';
 import { PositionDTO, WalletDTO } from 'domain/dto';
 
-export const accumulateConsolidated = (positions: PositionDTO[]) =>
-  positions.reduce((count, { currentPrice }) => count + currentPrice, 0);
-
 export const getPositionsCurrentValues = (
   bdrs: { latestPrice: number; symbol: string }[],
 ): any => {
