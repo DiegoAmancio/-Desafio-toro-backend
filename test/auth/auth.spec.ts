@@ -6,8 +6,9 @@ import { Providers } from 'domain/enums';
 import { createUser, email, name, userId } from './auth.mock';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '@application/service/auth.service';
-import { createWallet } from 'test/wallet/wallet.mock';
+
 import { IIexApi } from '@application/out/iex.interface';
+import { createWallet } from '../wallet/wallet.mock';
 
 describe('AuthService', () => {
   let service: AuthService;
