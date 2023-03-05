@@ -7,11 +7,16 @@ import {
   mapBDRsToStocksDTO,
   validBDRResponse,
 } from '@application/helper';
-import { IWalletService } from '@application/in';
-import { IWalletRepository } from '@application/out';
+import { IUserService, IWalletService } from '@application/in';
+import { IUserRepository, IWalletRepository } from '@application/out';
 import { IIexApi } from '@application/out/iex.interface';
-import { Injectable, Logger, Inject } from '@nestjs/common';
-import { OrderPositionDTO, PositionDTO, WalletDTO } from 'domain/dto';
+import { Injectable, Logger, Inject, HttpException } from '@nestjs/common';
+import {
+  DepositDTO,
+  OrderPositionDTO,
+  PositionDTO,
+  WalletDTO,
+} from 'domain/dto';
 import { StocksDTO } from 'domain/dto/stocks.dto';
 import { PK, Providers } from 'domain/enums';
 
@@ -23,6 +28,8 @@ export class WalletService implements IWalletService {
     private readonly walletRepository: IWalletRepository,
     @Inject(Providers.I_IEX_SERVICE)
     private readonly iexAPI: IIexApi,
+    @Inject(Providers.I_USER_REPOSITORY)
+    private readonly userRepository: IUserRepository,
   ) {}
 
   private getWalletDTOFromEntity = async (wallet: WalletEntity) => {
@@ -104,6 +111,28 @@ export class WalletService implements IWalletService {
       PK: PK.WALLET,
       SK: id,
     });
+
+    return this.getWalletDTOFromEntity(dynamoWallet);
+  }
+
+  async deposit(deposit: DepositDTO, id: string): Promise<WalletDTO> {
+    this.logger.log('deposit user: ' + id);
+
+    const user = await this.userRepository.getUser({ PK: PK.USER, SK: id });
+
+    if (user.Cpf !== deposit.origin.cpf) {
+      throw new HttpException('O CPF informado não é mesmo dessa conta', 403);
+    }
+
+    const dynamoWallet = await this.walletRepository.getWallet({
+      PK: PK.WALLET,
+      SK: id,
+    });
+
+    dynamoWallet.CheckingAccountAmount =
+      dynamoWallet.checkingAccountAmount + deposit.amount;
+
+    await this.walletRepository.updateWallet(dynamoWallet);
 
     return this.getWalletDTOFromEntity(dynamoWallet);
   }

@@ -9,7 +9,7 @@ import {
   Post,
   Body,
 } from '@nestjs/common';
-import { OrderPositionDTO, WalletDTO } from 'domain/dto';
+import { DepositDTO, OrderPositionDTO, WalletDTO } from 'domain/dto';
 import { StocksDTO } from 'domain/dto/stocks.dto';
 import { Providers } from 'domain/enums';
 
@@ -37,5 +37,11 @@ export class WalletController {
     @Req() req: any,
   ): Promise<WalletDTO> {
     return this.accountService.orderStocks(orderStock, req.user.id);
+  }
+
+  @Post('sbp/events')
+  @UseGuards(JwtAuthGuard)
+  deposit(@Body() deposit: DepositDTO, @Req() req: any): Promise<WalletDTO> {
+    return this.accountService.deposit(deposit, req.user.id);
   }
 }

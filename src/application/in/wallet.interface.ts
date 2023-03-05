@@ -1,4 +1,4 @@
-import { OrderPositionDTO, WalletDTO } from 'domain/dto';
+import { DepositDTO, OrderPositionDTO, WalletDTO } from 'domain/dto';
 import { StocksDTO } from 'domain/dto/stocks.dto';
 
 export interface IWalletService {
@@ -6,4 +6,5 @@ export interface IWalletService {
   createWallet(id: string): Promise<void>;
   orderStocks(orderStock: OrderPositionDTO, userId: string): Promise<WalletDTO>;
   getTopFiveStocks(): Promise<StocksDTO[]>;
+  deposit(deposit: DepositDTO, id: string): Promise<WalletDTO>;
 }

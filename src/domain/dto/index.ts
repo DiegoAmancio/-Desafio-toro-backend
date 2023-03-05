@@ -3,3 +3,4 @@ export * from './getItem.dto';
 export * from './position.dto';
 export * from './wallet.dto';
 export * from './orderPosition.dto';
+export * from './deposit.dto';
