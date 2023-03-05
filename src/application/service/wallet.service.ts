@@ -1,14 +1,16 @@
 import { WalletEntity } from '@adapterOut/wallet/wallet.entity';
 import {
-  getValues,
   validateOrder,
   addOrder,
   getPositionsCurrentValues,
   positionsModelToEntityList,
+  mapBDRsToStocksDTO,
+  validBDRResponse,
 } from '@application/helper';
 import { IWalletService } from '@application/in';
 import { IWalletRepository } from '@application/out';
-import { Injectable, Logger, Inject } from '@nestjs/common';
+import { IIexApi } from '@application/out/iex.interface';
+import { Injectable, Logger, Inject, HttpException } from '@nestjs/common';
 import { OrderPositionDTO, PositionDTO, WalletDTO } from 'domain/dto';
 import { StocksDTO } from 'domain/dto/stocks.dto';
 import { PK, Providers } from 'domain/enums';
@@ -19,12 +21,21 @@ export class WalletService implements IWalletService {
   constructor(
     @Inject(Providers.I_ACCOUNT_REPOSITORY)
     private readonly walletRepository: IWalletRepository,
+    @Inject(Providers.I_IEX_SERVICE)
+    private readonly iexAPI: IIexApi,
   ) {}
   async getTopFiveStocks(): Promise<StocksDTO[]> {
     this.logger.log('getTopFiveStocks');
 
     const topFiveStocks = ['JPM', 'GOOGL', 'BRK.B', 'JNJ', 'AAPL'];
-    return getValues(topFiveStocks);
+
+    const bdrs = await Promise.all(
+      topFiveStocks.map(bdr => this.iexAPI.getBDR(bdr)),
+    );
+
+    validBDRResponse(bdrs, topFiveStocks);
+
+    return mapBDRsToStocksDTO(bdrs);
   }
 
   async orderStocks(
@@ -32,20 +43,22 @@ export class WalletService implements IWalletService {
     userId: string,
   ): Promise<WalletDTO> {
     this.logger.log(`orderStocks ${JSON.stringify(orderStock)} ` + userId);
-    const [values, dynamoWallet] = await Promise.all([
-      getValues([orderStock.symbol]),
+    const [bdr, dynamoWallet] = await Promise.all([
+      this.iexAPI.getBDR(orderStock.symbol),
       this.walletRepository.getWallet({
         PK: PK.WALLET,
         SK: userId,
       }),
     ]);
 
-    const { currentPrice } = values[0];
+    if (!bdr) {
+      throw new HttpException('BDR não encontrado', 404);
+    }
 
     const newPosition = new PositionDTO(
       orderStock.symbol,
       orderStock.amount,
-      currentPrice,
+      bdr.currentPrice,
     );
     const wallet = new WalletDTO(
       dynamoWallet.checkingAccountAmount,
@@ -55,7 +68,7 @@ export class WalletService implements IWalletService {
     this.logger.log('validateOrder');
 
     validateOrder(
-      currentPrice,
+      bdr.currentPrice,
       orderStock.amount,
       wallet.checkingAccountAmount,
     );
@@ -89,30 +102,11 @@ export class WalletService implements IWalletService {
       SK: id,
     });
 
-    const positionsCurrentValues = await getPositionsCurrentValues(
+    const symbolsData = await this.iexAPI.getMultipleBDRs(
       accountPosition.positions.map(({ symbol }) => symbol),
     );
 
-    return new WalletDTO(
-      accountPosition.checkingAccountAmount,
-      positionsModelToEntityList(
-        accountPosition.positions,
-        positionsCurrentValues,
-      ),
-    );
-  }
-
-  async createAccountPosition(id: string) {
-    this.logger.log(`getWallet ${id}`);
-
-    const accountPosition = await this.walletRepository.getWallet({
-      PK: PK.WALLET,
-      SK: id,
-    });
-
-    const positionsCurrentValues = await getPositionsCurrentValues(
-      accountPosition.positions.map(({ symbol }) => symbol),
-    );
+    const positionsCurrentValues = await getPositionsCurrentValues(symbolsData);
 
     return new WalletDTO(
       accountPosition.checkingAccountAmount,

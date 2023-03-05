@@ -1,2 +1,2 @@
-export * from './account.helper';
+export * from './wallet.helper';
 export * from './stocks.helper';

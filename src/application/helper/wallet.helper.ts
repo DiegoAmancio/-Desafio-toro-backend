@@ -1,5 +1,3 @@
-import { WalletEntity } from '@adapterOut/wallet/wallet.entity';
-import { getBDR } from '@application/api/iex.api';
 import { HttpException } from '@nestjs/common';
 import { Position } from '@adapterOut/wallet/position';
 import { PositionDTO, WalletDTO } from 'domain/dto';
@@ -7,11 +5,9 @@ import { PositionDTO, WalletDTO } from 'domain/dto';
 export const accumulateConsolidated = (positions: PositionDTO[]) =>
   positions.reduce((count, { currentPrice }) => count + currentPrice, 0);
 
-export const getPositionsCurrentValues = async (
-  symbols: string[],
-): Promise<any> => {
-  const bdrs = await Promise.all(symbols.map(symbol => getBDR(symbol)));
-
+export const getPositionsCurrentValues = (
+  bdrs: { latestPrice: number; symbol: string }[],
+): any => {
   return bdrs.reduce(
     (
       accumulate,

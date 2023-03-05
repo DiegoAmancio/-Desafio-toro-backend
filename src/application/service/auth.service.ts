@@ -1,7 +1,7 @@
 import { IUserService } from '@application/in';
 import { IAuthService } from '@application/in/auth.interface';
 
-import { IGoogleService } from '@application/in/google.interface';
+import { IGoogleService } from '@application/out/google.interface';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PK, Providers } from 'domain/enums';

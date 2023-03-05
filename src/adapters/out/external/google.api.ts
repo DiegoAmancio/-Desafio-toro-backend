@@ -1,10 +1,10 @@
-import { IGoogleService } from '@application/in/google.interface';
+import { IGoogleApi } from '@application/out/google.interface';
 import { Injectable, Logger } from '@nestjs/common';
 
 import { OAuth2Client, TokenPayload } from 'google-auth-library';
 
 @Injectable()
-export class GoogleService implements IGoogleService {
+export class GoogleService implements IGoogleApi {
   private readonly logger = new Logger(GoogleService.name);
   private readonly oAuth2Client = new OAuth2Client(
     `${process.env.OAUTH_GOOGLE_ID}`,
