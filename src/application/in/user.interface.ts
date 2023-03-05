@@ -1,4 +1,4 @@
-import { UserEntity } from '@adapterOut/user';
+import { UserEntity } from '@adapterOut/user/user.entity';
 import { CreateUserDTO, GetItemDTO } from 'domain/dto';
 
 export interface IUserService {

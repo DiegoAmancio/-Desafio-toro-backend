@@ -1,4 +1,4 @@
-import { UserEntity } from '@adapterOut/user';
+import { UserEntity } from '@adapterOut/user/user.entity';
 
 export const userId = '123131312312313';
 export const email = 'top@gmail.com';

@@ -2,8 +2,7 @@ import { Module, Provider } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Providers } from 'domain/enums/providers.enum';
 import { GoogleService, IexService } from './external';
-
-import { UserRepository } from './user';
+import { UserRepository } from './user/user.repository';
 import { WalletRepository } from './wallet/wallet.repository';
 
 const userPositionProvider: Provider = {

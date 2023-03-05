@@ -2,7 +2,7 @@ import { IUserService, IWalletService } from '@application/in';
 import { IUserRepository } from '@application/out';
 import { Injectable, Logger, Inject } from '@nestjs/common';
 import { CreateUserDTO, GetItemDTO } from 'domain/dto';
-import { UserEntity } from '@adapterOut/user';
+import { UserEntity } from '@adapterOut/user/user.entity';
 import { Providers } from 'domain/enums';
 
 @Injectable()

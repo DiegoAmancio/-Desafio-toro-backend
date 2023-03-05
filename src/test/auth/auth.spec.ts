@@ -95,5 +95,36 @@ describe('AuthService', () => {
         name,
       });
     });
+    it('should be login in system', async () => {
+      mockRepository.getUser = jest.fn().mockReturnValue(
+        new Promise((_resolve, reject) => {
+          reject(null);
+        }),
+      );
+      const user = await service.login('topado');
+
+      expect(mockGoogleApi.getUserByToken).toBeCalledWith('topado');
+      expect(mockRepository.createUser).toBeCalledWith({
+        email,
+        id: userId,
+        name,
+      });
+
+      expect(user).toStrictEqual({
+        access_token: 'top',
+        name,
+      });
+    });
+  });
+  describe('When decode token', () => {
+    it('should be get information from token', () => {
+      const information = service.getUserByToken('topado');
+
+      expect(information).toStrictEqual({
+        email,
+        id: userId,
+        name,
+      });
+    });
   });
 });
