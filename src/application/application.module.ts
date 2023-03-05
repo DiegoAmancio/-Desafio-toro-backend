@@ -8,7 +8,7 @@ import { AuthService } from './service/auth.service';
 import { JwtModule as module } from '@nestjs/jwt';
 
 const accountServiceProvider: Provider = {
-  provide: Providers.I_ACCOUNT_SERVICE,
+  provide: Providers.I_WALLET_SERVICE,
   useClass: WalletService,
 };
 

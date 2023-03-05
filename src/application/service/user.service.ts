@@ -11,7 +11,7 @@ export class UserService implements IUserService {
   constructor(
     @Inject(Providers.I_USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
-    @Inject(Providers.I_ACCOUNT_SERVICE)
+    @Inject(Providers.I_WALLET_SERVICE)
     private readonly accountService: IWalletService,
   ) {}
   async createUser(payload: CreateUserDTO): Promise<void> {

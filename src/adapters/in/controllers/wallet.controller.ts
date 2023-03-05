@@ -16,7 +16,7 @@ import { Providers } from 'domain/enums';
 @Controller('')
 export class WalletController {
   constructor(
-    @Inject(Providers.I_ACCOUNT_SERVICE)
+    @Inject(Providers.I_WALLET_SERVICE)
     private accountService: IWalletService,
   ) {}
   @Get('userPosition')

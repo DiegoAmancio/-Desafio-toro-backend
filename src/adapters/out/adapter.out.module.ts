@@ -7,7 +7,7 @@ import { UserRepository } from './user';
 import { WalletRepository } from './wallet/wallet.repository';
 
 const userPositionProvider: Provider = {
-  provide: Providers.I_ACCOUNT_REPOSITORY,
+  provide: Providers.I_WALLET_REPOSITORY,
   useClass: WalletRepository,
 };
 const userProvider: Provider = {

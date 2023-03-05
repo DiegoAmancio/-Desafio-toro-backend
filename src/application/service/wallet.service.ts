@@ -10,7 +10,7 @@ import {
 import { IWalletService } from '@application/in';
 import { IWalletRepository } from '@application/out';
 import { IIexApi } from '@application/out/iex.interface';
-import { Injectable, Logger, Inject, HttpException } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { OrderPositionDTO, PositionDTO, WalletDTO } from 'domain/dto';
 import { StocksDTO } from 'domain/dto/stocks.dto';
 import { PK, Providers } from 'domain/enums';
@@ -19,7 +19,7 @@ import { PK, Providers } from 'domain/enums';
 export class WalletService implements IWalletService {
   private readonly logger = new Logger(WalletService.name);
   constructor(
-    @Inject(Providers.I_ACCOUNT_REPOSITORY)
+    @Inject(Providers.I_WALLET_REPOSITORY)
     private readonly walletRepository: IWalletRepository,
     @Inject(Providers.I_IEX_SERVICE)
     private readonly iexAPI: IIexApi,

@@ -35,7 +35,7 @@ describe('WalletService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         {
-          provide: Providers.I_ACCOUNT_REPOSITORY,
+          provide: Providers.I_WALLET_REPOSITORY,
           useValue: mockRepository,
         },
         {
@@ -147,34 +147,4 @@ describe('WalletService', () => {
       }
     });
   });
-  // describe('When update Author', () => {
-  //   it('Should update a Author', async () => {
-  //     mockRepository.getAuthor.mockReturnValue(authorMock);
-
-  //     const authorUpdated = await service.updateAuthor(updateAuthorData);
-
-  //     expect(mockRepository.getAuthor).toHaveBeenCalledWith(
-  //       updateAuthorData.id,
-  //     );
-  //     expect(mockRepository.updateAuthor).toHaveBeenCalledWith(authorMock);
-  //     expect(authorUpdated).toBe('Author updated');
-  //   });
-  // });
-  // describe('When delete Author', () => {
-  //   it('Should delete Author', async () => {
-  //     mockRepository.getAuthor.mockReturnValue(getAuthorMock);
-
-  //     const authorDeleted = await service.deleteAuthor(authorMock.id);
-
-  //     expect(mockRepository.getAuthor).toHaveBeenCalledWith(authorMock.id);
-  //     expect(mockRepository.deleteAuthor).toHaveBeenCalledWith(authorMock.id);
-  //     expect(authorDeleted).toBe(true);
-  //   });
-  //   it('Should return a exception when atempt delete Author not register', async () => {
-  //     mockRepository.getAuthor.mockReturnValue(null);
-
-  //     const authorDeleted = service.deleteAuthor('213');
-  //     expect(authorDeleted).rejects.toThrow(NotFoundException);
-  //   });
-  // });
 });
