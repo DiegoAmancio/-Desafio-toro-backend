@@ -10,6 +10,8 @@ import {
   getWalletRepository,
   mockIex,
   successfulGetTopFive,
+  successfullOrderUserStock,
+  successfulOrderNewStock,
   walletPatternId,
 } from './wallet.mock';
 import { IIexApi } from '@application/out/iex.interface';
@@ -89,30 +91,62 @@ describe('WalletService', () => {
       }
     });
   });
-  // describe('When order stock', () => {
-  //   it('should be order stock', async () => {
-  //     const author = await service.orderStocks(
-  //       { amount: 1, symbol: 'JPM' },
-  //       walletPatternId,
-  //     );
+  describe('When order stock', () => {
+    it('Should return a exception when does not to find a Author', async () => {
+      mockIexApi.getMultipleBDRs = jest.fn().mockReturnValue(mockIex);
+      mockRepository.getWallet = jest
+        .fn()
+        .mockReturnValue(getWalletRepository(150));
 
-  //     expect(mockRepository.getWallet).toBeCalledWith({
-  //       PK: PK.WALLET,
-  //       SK: walletPatternId,
-  //     });
-  //     expect(mockIexApi.getBDR).toBeCalledWith('JPM');
+      const order = await service.orderStocks(
+        { amount: 1, symbol: 'JPM' },
+        walletPatternId,
+      );
 
-  //     expect(author).toStrictEqual(getAuthorMock);
-  //   });
-  //   it('Should return a exception when does not to find a Author', async () => {
-  //     mockRepository.getAuthor.mockReturnValue(null);
+      expect(order).toStrictEqual(successfullOrderUserStock);
+    });
+    it('Should be order new stock', async () => {
+      mockIexApi.getBDR = jest
+        .fn()
+        .mockReturnValue({ latestPrice: 1, symbol: 'JBR' });
 
-  //     const Author = service.getAuthor(authorMock.id);
+      mockIexApi.getMultipleBDRs = jest.fn().mockReturnValue(mockIex);
 
-  //     expect(mockRepository.getAuthor).toHaveBeenCalledWith(authorMock.id);
-  //     expect(Author).rejects.toThrow(NotFoundException);
-  //   });
-  // });
+      const order = await service.orderStocks(
+        { amount: 1, symbol: 'JBR' },
+        walletPatternId,
+      );
+
+      expect(order).toStrictEqual(successfulOrderNewStock);
+    });
+    it('should be not order stock, do not have enough checkingAccountAmount', async () => {
+      mockIexApi.getBDR = jest.fn().mockReturnValue(null);
+      try {
+        await service.orderStocks(
+          { amount: 1, symbol: 'tte' },
+          walletPatternId,
+        );
+      } catch (error) {
+        expect(error.message).toStrictEqual('BDR não encontrado');
+      }
+    });
+    it('should be not order stock, do not have enough checkingAccountAmount', async () => {
+      mockRepository.getWallet = jest
+        .fn()
+        .mockReturnValue(getWalletRepository(0));
+      mockIexApi.getBDR = jest
+        .fn()
+        .mockReturnValue({ latestPrice: 10, symbol: 'JPM' });
+      try {
+        await service.orderStocks(
+          { amount: 1, symbol: 'JPM' },
+          walletPatternId,
+        );
+      } catch (error) {
+        expect(error.message).toStrictEqual('Não há saldo disponível');
+      }
+    });
+  });
   // describe('When update Author', () => {
   //   it('Should update a Author', async () => {
   //     mockRepository.getAuthor.mockReturnValue(authorMock);

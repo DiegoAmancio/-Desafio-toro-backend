@@ -5,7 +5,7 @@ export class WalletDTO {
   positions: PositionDTO[];
   consolidated: number;
 
-  constructor(checkingAccountAmount = 0, positions = []) {
+  constructor(checkingAccountAmount: number, positions: PositionDTO[]) {
     this.checkingAccountAmount = checkingAccountAmount;
     this.positions = positions;
 

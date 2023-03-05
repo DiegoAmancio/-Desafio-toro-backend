@@ -24,6 +24,20 @@ export class WalletService implements IWalletService {
     @Inject(Providers.I_IEX_SERVICE)
     private readonly iexAPI: IIexApi,
   ) {}
+
+  private getWalletDTOFromEntity = async (wallet: WalletEntity) => {
+    const symbolsData = await this.iexAPI.getMultipleBDRs(
+      wallet.positions.map(({ symbol }) => symbol),
+    );
+
+    const bdrsCurrentValues = getPositionsCurrentValues(symbolsData);
+
+    return new WalletDTO(
+      wallet.checkingAccountAmount,
+      positionsModelToEntityList(wallet.positions, bdrsCurrentValues),
+    );
+  };
+
   async getTopFiveStocks(): Promise<StocksDTO[]> {
     this.logger.log('getTopFiveStocks');
 
@@ -41,6 +55,7 @@ export class WalletService implements IWalletService {
     userId: string,
   ): Promise<WalletDTO> {
     this.logger.log(`orderStocks ${JSON.stringify(orderStock)} ` + userId);
+
     const [bdr, dynamoWallet] = await Promise.all([
       this.iexAPI.getBDR(orderStock.symbol),
       this.walletRepository.getWallet({
@@ -49,27 +64,17 @@ export class WalletService implements IWalletService {
       }),
     ]);
 
-    if (!bdr) {
-      throw new HttpException('BDR não encontrado', 404);
-    }
+    this.logger.log('validateOrder');
+
+    validateOrder(bdr, orderStock.amount, dynamoWallet.checkingAccountAmount);
 
     const newPosition = new PositionDTO(
       orderStock.symbol,
       orderStock.amount,
-      bdr.currentPrice,
-    );
-    const wallet = new WalletDTO(
-      dynamoWallet.checkingAccountAmount,
-      dynamoWallet.positions,
+      bdr.latestPrice,
     );
 
-    this.logger.log('validateOrder');
-
-    validateOrder(
-      bdr.currentPrice,
-      orderStock.amount,
-      wallet.checkingAccountAmount,
-    );
+    const wallet = await this.getWalletDTOFromEntity(dynamoWallet);
 
     const updatedWalletDTO = addOrder(newPosition, wallet);
 
@@ -95,23 +100,11 @@ export class WalletService implements IWalletService {
   async getWallet(id: string): Promise<WalletDTO> {
     this.logger.log(`getWallet ${id}`);
 
-    const accountPosition = await this.walletRepository.getWallet({
+    const dynamoWallet = await this.walletRepository.getWallet({
       PK: PK.WALLET,
       SK: id,
     });
 
-    const symbolsData = await this.iexAPI.getMultipleBDRs(
-      accountPosition.positions.map(({ symbol }) => symbol),
-    );
-
-    const positionsCurrentValues = await getPositionsCurrentValues(symbolsData);
-
-    return new WalletDTO(
-      accountPosition.checkingAccountAmount,
-      positionsModelToEntityList(
-        accountPosition.positions,
-        positionsCurrentValues,
-      ),
-    );
+    return this.getWalletDTOFromEntity(dynamoWallet);
   }
 }
