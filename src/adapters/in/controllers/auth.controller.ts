@@ -1,5 +1,5 @@
 import { IAuthService } from '@application/in/auth.interface';
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get, Inject, Post, Req } from '@nestjs/common';
 import { Headers } from '@nestjs/common';
 
 import { Providers } from 'domain/enums';
@@ -11,8 +11,13 @@ export class AuthController {
     private authService: IAuthService,
   ) {}
 
-  @Get('login')
-  login(@Headers() headers: any) {
-    return this.authService.login(headers.token);
+  @Get('isRegistered')
+  isRegistered(@Headers() headers: any) {
+    return this.authService.isRegistered(headers.authorization);
+  }
+
+  @Post('login')
+  login(@Headers() headers: any, @Req() { body }: { body: { cpf?: string } }) {
+    return this.authService.login(headers.authorization, body.cpf);
   }
 }

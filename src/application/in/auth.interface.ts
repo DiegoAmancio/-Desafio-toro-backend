@@ -1,4 +1,5 @@
 export interface IAuthService {
-  login(token: string): Promise<any>;
+  isRegistered(token: string): Promise<boolean>;
+  login(token: string, cpf?: string): Promise<any>;
   getUserByToken(token: string);
 }

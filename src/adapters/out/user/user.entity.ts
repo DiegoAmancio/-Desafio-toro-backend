@@ -22,11 +22,18 @@ export class UserEntity {
   @attribute()
   Name: string;
 
-  fill(id: string, email: string, name: string) {
+  @attribute()
+  Cpf: string;
+
+  @attribute()
+  Account: string;
+
+  fill(id: string, email: string, name: string, cpf: string) {
     this.PK = UserEntity.PK_PREFIX;
     this.SK = id;
-
+    this.Cpf = cpf;
     this.Email = email;
     this.Name = name;
+    this.Account = '40000';
   }
 }

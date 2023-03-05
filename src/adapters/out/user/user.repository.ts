@@ -28,7 +28,7 @@ export class UserRepository implements IUserRepository {
 
   async createUser(payload: CreateUserDTO): Promise<void> {
     const item = new UserEntity();
-    item.fill(payload.id, payload.email, payload.name);
+    item.fill(payload.id, payload.email, payload.name, payload.cpf);
 
     await this.mapper.put<UserEntity>(item);
   }
