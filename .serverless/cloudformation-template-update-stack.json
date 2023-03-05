@@ -1,0 +1,475 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "The AWS CloudFormation template for this Serverless application",
+  "Resources": {
+    "ServerlessDeploymentBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "ServerlessDeploymentBucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "ServerlessDeploymentBucket"
+        },
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "s3:*",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":s3:::",
+                      {
+                        "Ref": "ServerlessDeploymentBucket"
+                      },
+                      "/*"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":s3:::",
+                      {
+                        "Ref": "ServerlessDeploymentBucket"
+                      }
+                    ]
+                  ]
+                }
+              ],
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "MainLogGroup": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {
+        "LogGroupName": "/aws/lambda/sls-desafio-toro-hml-main"
+      }
+    },
+    "IamRoleLambdaExecution": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": {
+              "Fn::Join": [
+                "-",
+                [
+                  "sls-desafio-toro",
+                  "hml",
+                  "lambda"
+                ]
+              ]
+            },
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:CreateLogStream",
+                    "logs:CreateLogGroup",
+                    "logs:TagResource"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/sls-desafio-toro-hml*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/sls-desafio-toro-hml*:*:*"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "lambda:InvokeFunction",
+                    "lambda:AddPermission",
+                    "lambda:RemovePermission"
+                  ],
+                  "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "dynamodb:Query",
+                    "dynamodb:GetItem",
+                    "dynamodb:PutItem",
+                    "dynamodb:UpdateItem",
+                    "dynamodb:DeleteItem"
+                  ],
+                  "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "secretsmanager:GetSecretValue"
+                  ],
+                  "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ssm:GetParameter"
+                  ],
+                  "Resource": "*"
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "cloudwatch:DescribeAlarms",
+                    "cloudwatch:GetMetricStatistics",
+                    "logs:DescribeLogStreams",
+                    "logs:GetLogEvents",
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ],
+        "Path": "/",
+        "RoleName": {
+          "Fn::Join": [
+            "-",
+            [
+              "sls-desafio-toro",
+              "hml",
+              {
+                "Ref": "AWS::Region"
+              },
+              "lambdaRole"
+            ]
+          ]
+        }
+      }
+    },
+    "MainLambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "ServerlessDeploymentBucket"
+          },
+          "S3Key": "serverless/sls-desafio-toro/hml/1677974544992-2023-03-05T00:02:24.992Z/sls-desafio-toro.zip"
+        },
+        "Handler": "src/main.handler",
+        "Runtime": "nodejs16.x",
+        "FunctionName": "sls-desafio-toro-hml-main",
+        "MemorySize": 1024,
+        "Timeout": 6,
+        "Environment": {
+          "Variables": {
+            "STAGE": "hml",
+            "AWS_ACCOUNT_ID": "985022110574",
+            "AWS_REGION_DEFAULT": "us-east-1",
+            "GOOGLE_ENDPOINT": "https://www.googleapis.com/oauth2/v2/userinfo",
+            "OAUTH_GOOGLE_ID": "950333149471-l01s3m31jiukpnauj53j6mmhl4hmghdo.apps.googleusercontent.com",
+            "OAUTH_GOOGLE_SECRET": "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",
+            "OAUTH_GOOGLE_REDIRECT_URL": "http://localhost:3001/auth/google/redirect"
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "IamRoleLambdaExecution",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "MainLogGroup"
+      ]
+    },
+    "MainLambdaVersionxgZoNxt6Yzz3JGizLDtSrNfMIZBgMUh7oJ0voxFA": {
+      "Type": "AWS::Lambda::Version",
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "MainLambdaFunction"
+        },
+        "CodeSha256": "KtxE7QH6xWGHkNKFDadGNB4h1qc1O6mtLT7DjSnOR+A="
+      }
+    },
+    "HttpApi": {
+      "Type": "AWS::ApiGatewayV2::Api",
+      "Properties": {
+        "Name": "hml-sls-desafio-toro",
+        "ProtocolType": "HTTP",
+        "CorsConfiguration": {
+          "AllowHeaders": [
+            "Domain",
+            "Content-Type",
+            "Authorization"
+          ],
+          "AllowMethods": [
+            "OPTIONS",
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "HEAD",
+            "DELETE"
+          ],
+          "AllowOrigins": [
+            "*"
+          ]
+        }
+      }
+    },
+    "HttpApiStage": {
+      "Type": "AWS::ApiGatewayV2::Stage",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "StageName": "$default",
+        "AutoDeploy": true,
+        "DefaultRouteSettings": {
+          "DetailedMetricsEnabled": false
+        }
+      }
+    },
+    "MainLambdaPermissionHttpApi": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "MainLambdaFunction",
+            "Arn"
+          ]
+        },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:",
+              {
+                "Ref": "AWS::Partition"
+              },
+              ":execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "HttpApi"
+              },
+              "/*"
+            ]
+          ]
+        }
+      }
+    },
+    "HttpApiIntegrationMain": {
+      "Type": "AWS::ApiGatewayV2::Integration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "IntegrationType": "AWS_PROXY",
+        "IntegrationUri": {
+          "Fn::GetAtt": [
+            "MainLambdaFunction",
+            "Arn"
+          ]
+        },
+        "PayloadFormatVersion": "2.0",
+        "TimeoutInMillis": 30000
+      }
+    },
+    "HttpApiRouteAnyAnyVar": {
+      "Type": "AWS::ApiGatewayV2::Route",
+      "Properties": {
+        "ApiId": {
+          "Ref": "HttpApi"
+        },
+        "RouteKey": "ANY /{any+}",
+        "Target": {
+          "Fn::Join": [
+            "/",
+            [
+              "integrations",
+              {
+                "Ref": "HttpApiIntegrationMain"
+              }
+            ]
+          ]
+        }
+      },
+      "DependsOn": "HttpApiIntegrationMain"
+    },
+    "SecretsManager": {
+      "Type": "AWS::SecretsManager::Secret",
+      "Properties": {
+        "Name": "sls-desafio-toro",
+        "Tags": [
+          {
+            "Key": "ManagedBy",
+            "Value": "Serverless Framework"
+          }
+        ]
+      }
+    },
+    "DesafioToro": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": "desafio-toro",
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "PK",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "SK",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "Document",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "Email",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "Name",
+            "AttributeType": "S"
+          }
+        ],
+        "KeySchema": [
+          {
+            "AttributeName": "PK",
+            "KeyType": "HASH"
+          },
+          {
+            "AttributeName": "SK",
+            "KeyType": "RANGE"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": "ManagedBy",
+            "Value": "Serverless Framework"
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "ServerlessDeploymentBucketName": {
+      "Value": {
+        "Ref": "ServerlessDeploymentBucket"
+      },
+      "Export": {
+        "Name": "sls-sls-desafio-toro-hml-ServerlessDeploymentBucketName"
+      }
+    },
+    "MainLambdaFunctionQualifiedArn": {
+      "Description": "Current Lambda function version",
+      "Value": {
+        "Ref": "MainLambdaVersionxgZoNxt6Yzz3JGizLDtSrNfMIZBgMUh7oJ0voxFA"
+      },
+      "Export": {
+        "Name": "sls-sls-desafio-toro-hml-MainLambdaFunctionQualifiedArn"
+      }
+    },
+    "HttpApiId": {
+      "Description": "Id of the HTTP API",
+      "Value": {
+        "Ref": "HttpApi"
+      },
+      "Export": {
+        "Name": "sls-sls-desafio-toro-hml-HttpApiId"
+      }
+    },
+    "HttpApiUrl": {
+      "Description": "URL of the HTTP API",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Ref": "HttpApi"
+            },
+            ".execute-api.",
+            {
+              "Ref": "AWS::Region"
+            },
+            ".",
+            {
+              "Ref": "AWS::URLSuffix"
+            }
+          ]
+        ]
+      },
+      "Export": {
+        "Name": "sls-sls-desafio-toro-hml-HttpApiUrl"
+      }
+    }
+  }
+}

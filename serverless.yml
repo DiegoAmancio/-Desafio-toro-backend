@@ -1,0 +1,81 @@
+service: sls-desafio-toro
+configValidationMode: warn
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-optimize
+  - serverless-webpack
+  - serverless-esbuild
+
+custom:
+  secrets: ${ssm:/aws/reference/secretsmanager/sls-desafio-toro}
+  defaultStage: hml
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: ${opt:stage, env:STAGE, self:custom.defaultStage}
+  region: ${env:AWS_REGION_DEFAULT, 'us-east-1'}
+  httpApi:
+    payload: '2.0'
+    cors:
+      allowedOrigins:
+        - '*'
+      allowedHeaders:
+        - Domain
+        - Content-Type
+        - Authorization
+
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - 'lambda:InvokeFunction'
+            - 'lambda:AddPermission'
+            - 'lambda:RemovePermission'
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - dynamodb:Query
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - 'secretsmanager:GetSecretValue'
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - 'ssm:GetParameter'
+          Resource: '*'
+        - Effect: Allow
+          Action:
+            - 'cloudwatch:DescribeAlarms'
+            - 'cloudwatch:GetMetricStatistics'
+            - 'logs:DescribeLogStreams'
+            - 'logs:GetLogEvents'
+            - 'logs:CreateLogGroup'
+            - 'logs:CreateLogStream'
+            - 'logs:PutLogEvents'
+          Resource: '*'
+
+  environment:
+    STAGE: ${opt:stage, env:STAGE, self:custom.defaultStage}
+    AWS_ACCOUNT_ID: ${aws:accountId}
+    AWS_REGION_DEFAULT: ${env:AWS_REGION_DEFAULT, self:provider.region}
+    GOOGLE_ENDPOINT: ${env:GOOGLE_ENDPOINT, self:custom.secrets.GOOGLE_ENDPOINT}
+    OAUTH_GOOGLE_ID: ${env:OAUTH_GOOGLE_ID, self:custom.secrets.OAUTH_GOOGLE_ID}
+    OAUTH_GOOGLE_SECRET: ${env:OAUTH_GOOGLE_SECRET, self:custom.secrets.OAUTH_GOOGLE_SECRET}
+    OAUTH_GOOGLE_REDIRECT_URL: ${env:OAUTH_GOOGLE_REDIRECT_URL, self:custom.secrets.OAUTH_GOOGLE_REDIRECT_URL}
+
+functions:
+  main:
+    handler: src/main.handler
+    events: ${file(resources/main.yml)}
+
+resources:
+  - ${file(resources/secrets-manager.yml)}
+  - ${file(resources/dynamodb.yml)}

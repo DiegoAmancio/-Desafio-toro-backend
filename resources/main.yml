@@ -1,0 +1,3 @@
+- httpApi:
+    method: any
+    path: /{any+}
