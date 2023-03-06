@@ -60,3 +60,13 @@ export const successfulOrderNewStock = new WalletDTO(149, [
   new PositionDTO('AAPL', 10, 50),
   new PositionDTO('JBR', 1, 1),
 ]);
+
+const successfulDepositPositions = defaultWalletItens.map(
+  ({ amount, symbol }, index) =>
+    new PositionDTO(symbol, amount, 10 * (index + 1)),
+);
+
+export const successfulDeposit = new WalletDTO(
+  1000,
+  successfulDepositPositions,
+);

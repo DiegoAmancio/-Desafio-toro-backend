@@ -13,10 +13,11 @@ import {
   successfullOrderUserStock,
   successfulOrderNewStock,
   walletPatternId,
+  successfulDeposit,
 } from './wallet.mock';
 import { IIexApi } from '@application/out/iex.interface';
 import { HttpException } from '@nestjs/common';
-import { createUser } from '../auth/auth.mock';
+import { cpf, createUser, userId } from '../auth/auth.mock';
 
 describe('WalletService', () => {
   let service: WalletService;
@@ -158,6 +159,54 @@ describe('WalletService', () => {
         );
       } catch (error) {
         expect(error.message).toStrictEqual('Não há saldo disponível');
+      }
+    });
+  });
+  describe('When deposit amount', () => {
+    it('Should deposit value', async () => {
+      const deposit = await service.deposit(
+        {
+          event: 'TRANSFER',
+          target: {
+            bank: '352',
+            branch: '0001',
+            account: '40000',
+          },
+          origin: {
+            bank: '033',
+            branch: '03312',
+            cpf,
+          },
+          amount: 1000,
+        },
+        userId,
+      );
+
+      expect(deposit).toStrictEqual(successfulDeposit);
+    });
+    it('Should not deposit value (wrong cpf)', async () => {
+      try {
+        await service.deposit(
+          {
+            event: 'TRANSFER',
+            target: {
+              bank: '352',
+              branch: '0001',
+              account: '40000',
+            },
+            origin: {
+              bank: '033',
+              branch: '03312',
+              cpf: '213123',
+            },
+            amount: 1000,
+          },
+          userId,
+        );
+      } catch (error) {
+        expect(error.message).toStrictEqual(
+          'O CPF informado não é mesmo dessa conta',
+        );
       }
     });
   });
