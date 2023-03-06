@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { IWalletRepository } from '@application/out';
+import { IUserRepository, IWalletRepository } from '@application/out';
 import { WalletService } from '@application/service';
 
 import { PK, Providers } from 'domain/enums';
@@ -16,6 +16,7 @@ import {
 } from './wallet.mock';
 import { IIexApi } from '@application/out/iex.interface';
 import { HttpException } from '@nestjs/common';
+import { createUser } from '../auth/auth.mock';
 
 describe('WalletService', () => {
   let service: WalletService;
@@ -31,9 +32,22 @@ describe('WalletService', () => {
     getMultipleBDRs: jest.fn().mockReturnValue(mockIex),
   };
 
+  const mockUserRepository: IUserRepository = {
+    createUser: jest.fn().mockReturnValue(null),
+    getUser: jest.fn().mockReturnValue(
+      new Promise(resolve => {
+        resolve(createUser());
+      }),
+    ),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        {
+          provide: Providers.I_USER_REPOSITORY,
+          useValue: mockUserRepository,
+        },
         {
           provide: Providers.I_WALLET_REPOSITORY,
           useValue: mockRepository,

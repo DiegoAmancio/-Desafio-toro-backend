@@ -3,7 +3,7 @@ import { IGoogleApi, IUserRepository } from '@application/out';
 import { UserService, WalletService } from '@application/service';
 
 import { Providers } from 'domain/enums';
-import { createUser, email, name, userId } from './auth.mock';
+import { cpf, createUser, email, name, userId } from './auth.mock';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from '@application/service/auth.service';
 
@@ -86,7 +86,7 @@ describe('AuthService', () => {
   });
 
   describe('When login', () => {
-    it('should be login in system', async () => {
+    it('should be login in system (is registered)', async () => {
       const user = await service.login('topado');
 
       expect(mockGoogleApi.getUserByToken).toBeCalledWith('topado');
@@ -96,25 +96,34 @@ describe('AuthService', () => {
         name,
       });
     });
-    it('should be login in system', async () => {
+    it('should be login in system (is not registered)', async () => {
       mockRepository.getUser = jest.fn().mockReturnValue(
         new Promise((_resolve, reject) => {
           reject(null);
         }),
       );
-      const user = await service.login('topado');
+      const user = await service.login('topado', cpf);
 
       expect(mockGoogleApi.getUserByToken).toBeCalledWith('topado');
       expect(mockRepository.createUser).toBeCalledWith({
         email,
         id: userId,
         name,
+        cpf,
       });
 
       expect(user).toStrictEqual({
         access_token: 'top',
         name,
       });
+    });
+    it('should be throw erro when user is not a client and not provide CPF', async () => {
+      try {
+        await service.login('topado');
+        expect(mockGoogleApi.getUserByToken).toBeCalledWith('topado');
+      } catch (error) {
+        expect(error.message).toStrictEqual('É necessário informar o cpf');
+      }
     });
   });
   describe('When decode token', () => {
@@ -126,6 +135,24 @@ describe('AuthService', () => {
         id: userId,
         name,
       });
+    });
+  });
+
+  describe('When decode token', () => {
+    it('should be verify is not a client', async () => {
+      const isClient = await service.isRegistered('topado');
+
+      expect(isClient).toStrictEqual(false);
+    });
+    it('should be verify is a client', async () => {
+      mockRepository.getUser = jest.fn().mockReturnValue(
+        new Promise(resolve => {
+          resolve(createUser());
+        }),
+      );
+      const isClient = await service.isRegistered('topado');
+
+      expect(isClient).toStrictEqual(true);
     });
   });
 });
