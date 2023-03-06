@@ -30,6 +30,20 @@
 
 ```bash
 $ npm install
+
+install aws cli
+
+use AWS configure  - https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html
+
+need .env, structure:
+
+PORT
+GOOGLE_ENDPOINT
+JWT_SECRET
+OAUTH_GOOGLE_ID
+OAUTH_GOOGLE_SECRET
+OAUTH_GOOGLE_REDIRECT_URL
+
 ```
 
 ## Running the app
@@ -51,23 +65,6 @@ $ npm run start:prod
 # unit tests
 $ npm run test
 
-# e2e tests
-$ npm run test:e2e
-
 # test coverage
 $ npm run test:cov
 ```
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).

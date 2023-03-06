@@ -32,14 +32,4 @@ export class WalletRepository implements IWalletRepository {
   async updateWallet(data: WalletEntity): Promise<void> {
     await this.mapper.update(data);
   }
-
-  //   throw 'need PK and SK';
-  // }
-
-  // async createUser(payload: CreateUserDTO): Promise<void> {
-  //   const item = new UserEntity();
-  //   item.fill(payload.id, payload.email, payload.name);
-
-  //   await this.mapper.put<UserEntity>(item);
-  // }
 }
